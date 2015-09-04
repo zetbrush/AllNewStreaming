@@ -82,12 +82,13 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 	@Override
 	protected void onResume() {
 		super.onResume();
+		toggleStreaming();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-
+		toggleStreaming();
 
 	}
 
@@ -129,14 +130,14 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 
 			// Start video stream
 			mClient.startStream();
-		} else {
+		}/* else {
 			// already streaming, stop streaming
 			// stop camera preview
 			mSession.stopPreview();
 
 			// stop streaming
 			mClient.stopStream();
-		}
+		}*/
 	}
 
 	@Override

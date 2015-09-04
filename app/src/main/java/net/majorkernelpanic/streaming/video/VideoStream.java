@@ -167,8 +167,8 @@ public abstract class VideoStream extends MediaStream {
 			mSurfaceHolderCallback = new Callback() {
 				@Override
 				public void surfaceDestroyed(SurfaceHolder holder) {
-					mSurfaceReady = false;
-					stopPreview();
+					mSurfaceReady = true;
+					//stopPreview();
 					Log.d(TAG,"Surface destroyed !");
 				}
 				@Override
