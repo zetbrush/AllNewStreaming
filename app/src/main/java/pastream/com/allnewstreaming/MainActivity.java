@@ -6,17 +6,26 @@ package pastream.com.allnewstreaming;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.hardware.display.VirtualDisplay;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
 import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
+import net.majorkernelpanic.streaming.video.VideoStream;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,15 +34,24 @@ import info.androidhive.androidvideostreaming.R;
 
 public class MainActivity extends Activity implements RtspClient.Callback,
 		Session.Callback, SurfaceHolder.Callback {
+	private static final int PERMISSION_CODE = 1;
 	// log tag
 	public final static String TAG = MainActivity.class.getSimpleName();
 
 	// surfaceview
 	private static SurfaceView mSurfaceView;
-
 	// Rtsp session
 	private Session mSession;
 	private static RtspClient mClient;
+	private static final int REQUEST_CODE = 1;
+	private MediaProjectionManager mMediaProjectionManager;
+	public static int mScreenDensity;
+	private MediaProjectionManager mProjectionManager;
+	private static final int DISPLAY_WIDTH = 480;
+	private static final int DISPLAY_HEIGHT = 640;
+	private static MediaProjection mMediaProjection;
+	private VirtualDisplay mVirtualDisplay;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,23 +66,29 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 
 		mSurfaceView.getHolder().addCallback(this);
 
+
 		// Initialize RTSP client
 		initRtspClient();
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		mScreenDensity = metrics.densityDpi;
+		mProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+		shareScreen();
+
 
 	}
+
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		toggleStreaming();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 
-		toggleStreaming();
+
 	}
 
 	private void initRtspClient() {
@@ -118,9 +142,6 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mClient.release();
-		mSession.release();
-		mSurfaceView.getHolder().removeCallback(this);
 	}
 
 	@Override
@@ -201,5 +222,44 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 	}
+
+	private void shareScreen() {
+		if (mMediaProjection == null) {
+			startActivityForResult(mProjectionManager.createScreenCaptureIntent(), PERMISSION_CODE);
+			return;
+		}
+
+
+	}
+
+	private void stopScreenSharing() {
+		if (mVirtualDisplay == null) {
+			return;
+		}
+		mVirtualDisplay.release();
+		//mMediaRecorder.release();
+	}
+
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode != PERMISSION_CODE) {
+			Log.e(TAG, "Unknown request code: " + requestCode);
+			return;
+		}
+		if (resultCode != RESULT_OK) {
+			Toast.makeText(this,
+					"Screen Cast Permission Denied", Toast.LENGTH_SHORT).show();
+
+			return;
+		}
+		mMediaProjection = mProjectionManager.getMediaProjection(resultCode, data);
+		VideoStream.setMediaProjection(mMediaProjection);
+		toggleStreaming();
+
+	}
+
+
 
 }

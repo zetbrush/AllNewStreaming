@@ -20,12 +20,12 @@
 
 package net.majorkernelpanic.streaming.video;
 
-import java.util.Iterator;
-import java.util.List;
-
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A class that represents the quality of a video stream. 
@@ -36,7 +36,7 @@ public class VideoQuality {
 	public final static String TAG = "VideoQuality";
 	
 	/** Default video stream quality. */
-	public final static VideoQuality DEFAULT_VIDEO_QUALITY = new VideoQuality(176,144,20,500000);
+	public final static VideoQuality DEFAULT_VIDEO_QUALITY = new VideoQuality(1920,1080,30,2000000);
 
 	/**	Represents a quality for a video stream. */ 
 	public VideoQuality() {}

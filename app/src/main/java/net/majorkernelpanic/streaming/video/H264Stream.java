@@ -197,7 +197,7 @@ public class H264Stream extends VideoStream {
 			mMediaRecorder = new MediaRecorder();
 			mMediaRecorder.setCamera(mCamera);
 			mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-			mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 			mMediaRecorder.setVideoEncoder(mVideoEncoder);
 			mMediaRecorder.setPreviewDisplay(mSurfaceView.getHolder().getSurface());
 			mMediaRecorder.setVideoSize(mRequestedQuality.resX,mRequestedQuality.resY);

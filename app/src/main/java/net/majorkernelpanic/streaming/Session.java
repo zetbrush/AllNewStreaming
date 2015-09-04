@@ -20,10 +20,10 @@
 
 package net.majorkernelpanic.streaming;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.CountDownLatch;
+import android.hardware.Camera.CameraInfo;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.audio.AudioStream;
@@ -35,10 +35,10 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 import net.majorkernelpanic.streaming.video.VideoStream;
-import android.hardware.Camera.CameraInfo;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * You should instantiate this class with the {@link SessionBuilder}.<br />

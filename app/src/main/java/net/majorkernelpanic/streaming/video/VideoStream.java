@@ -20,12 +20,25 @@
 
 package net.majorkernelpanic.streaming.video;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.Parameters;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaFormat;
+import android.media.MediaRecorder;
+import android.media.projection.MediaProjection;
+import android.os.Looper;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
 
 import net.majorkernelpanic.streaming.MediaStream;
 import net.majorkernelpanic.streaming.Stream;
@@ -36,22 +49,15 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.hw.EncoderDebugger;
 import net.majorkernelpanic.streaming.hw.NV21Convertor;
 import net.majorkernelpanic.streaming.rtp.MediaCodecInputStream;
-import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.Parameters;
-import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaFormat;
-import android.media.MediaRecorder;
-import android.os.Looper;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
+
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import pastream.com.allnewstreaming.MainActivity;
 
 /** 
  * Don't use this class directly.
@@ -82,7 +88,8 @@ public abstract class VideoStream extends MediaStream {
 	protected String mEncoderName;
 	protected int mEncoderColorFormat;
 	protected int mCameraImageFormat;
-	protected int mMaxFps = 0;	
+	protected int mMaxFps = 0;
+	protected static MediaProjection mMediaProjection;
 
 	/** 
 	 * Don't use this class directly.
@@ -335,24 +342,25 @@ public abstract class VideoStream extends MediaStream {
 		createSockets();
 
 		// Reopens the camera if needed
-		destroyCamera();
-		createCamera();
+	//	destroyCamera();
+	//	createCamera();
 
 		// The camera must be unlocked before the MediaRecorder can use it
-		unlockCamera();
+	//	unlockCamera();
 
 		try {
+
 			mMediaRecorder = new MediaRecorder();
-			mMediaRecorder.setCamera(mCamera);
-			mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-			mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			mMediaRecorder.setVideoEncoder(mVideoEncoder);
+
+			mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+			mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 			mMediaRecorder.setPreviewDisplay(mSurfaceView.getHolder().getSurface());
-			mMediaRecorder.setVideoSize(mRequestedQuality.resX,mRequestedQuality.resY);
+			mMediaRecorder.setVideoSize(mRequestedQuality.resX, mRequestedQuality.resY);
 			mMediaRecorder.setVideoFrameRate(mRequestedQuality.framerate);
 
 			// The bandwidth actually consumed is often above what was requested 
-			mMediaRecorder.setVideoEncodingBitRate((int)(mRequestedQuality.bitrate*0.8));
+			mMediaRecorder.setVideoEncodingBitRate((int) (mRequestedQuality.bitrate * 0.8));
 
 			// We write the output of the camera in a local socket instead of a file !			
 			// This one little trick makes streaming feasible quiet simply: data from the camera
@@ -366,6 +374,9 @@ public abstract class VideoStream extends MediaStream {
 			mMediaRecorder.setOutputFile(fd);
 
 			mMediaRecorder.prepare();
+
+			createVirtualDisplay(mMediaRecorder);
+
 			mMediaRecorder.start();
 
 		} catch (Exception e) {
@@ -401,6 +412,17 @@ public abstract class VideoStream extends MediaStream {
 
 		mStreaming = true;
 
+	}
+
+	public static void setMediaProjection(MediaProjection mMediaProjection){
+		VideoStream.mMediaProjection = mMediaProjection;
+	}
+
+	private static VirtualDisplay createVirtualDisplay(MediaRecorder mMediaRecorder) {
+		return mMediaProjection.createVirtualDisplay("MainActivity",
+				1280, 768, MainActivity.mScreenDensity,
+				DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+				mMediaRecorder.getSurface(), null /*Callbacks*/, null /*Handler*/);
 	}
 
 
