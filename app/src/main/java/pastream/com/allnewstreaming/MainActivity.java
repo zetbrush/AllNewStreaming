@@ -63,6 +63,8 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 		setContentView(R.layout.activity_main);
 
 		mSurfaceView = (SurfaceView) findViewById(R.id.surface);
+		//mSurfaceView = (SurfaceView) findViewById(R.id.surface);
+
 
 		mSurfaceView.getHolder().addCallback(this);
 
@@ -88,7 +90,7 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 	@Override
 	protected void onPause() {
 		super.onPause();
-		toggleStreaming();
+		//toggleStreaming();
 
 	}
 

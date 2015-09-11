@@ -583,34 +583,6 @@ public class Session {
 		});
 	}	
 
-	/**	Switch between the front facing and the back facing camera of the phone. <br />
-	 * If {@link #startPreview()} has been called, the preview will be  briefly interrupted. <br />
-	 * If {@link #start()} has been called, the stream will be  briefly interrupted.<br />
-	 * To find out which camera is currently selected, use {@link #getCamera()}
-	 **/
-	public void switchCamera() {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				if (mVideoStream != null) {
-					try {
-						mVideoStream.switchCamera();
-						postPreviewStarted();
-					} catch (CameraInUseException e) {
-						postError(ERROR_CAMERA_ALREADY_IN_USE , STREAM_VIDEO, e);
-					} catch (ConfNotSupportedException e) {
-						postError(ERROR_CONFIGURATION_NOT_SUPPORTED , STREAM_VIDEO, e);
-					} catch (InvalidSurfaceException e) {
-						postError(ERROR_INVALID_SURFACE , STREAM_VIDEO, e);
-					} catch (IOException e) {
-						postError(ERROR_OTHER, STREAM_VIDEO, e);
-					} catch (RuntimeException e) {
-						postError(ERROR_OTHER, STREAM_VIDEO, e);
-					}
-				}
-			}
-		});
-	}
 
 	/**
 	 * Returns the id of the camera currently selected. <br />
@@ -622,25 +594,7 @@ public class Session {
 
 	}
 
-	/** 
-	 * Toggles the LED of the phone if it has one.
-	 * You can get the current state of the flash with 
-	 * {@link Session#getVideoTrack()} and {@link VideoStream#getFlashState()}.
-	 **/
-	public void toggleFlash() {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				if (mVideoStream != null) {
-					try {
-						mVideoStream.toggleFlash();
-					} catch (RuntimeException e) {
-						postError(ERROR_CAMERA_HAS_NO_FLASH, STREAM_VIDEO, e);
-					}
-				}
-			}
-		});
-	}	
+
 
 	/** Deletes all existing tracks & release associated resources. */
 	public void release() {

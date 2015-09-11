@@ -20,10 +20,10 @@
 
 package net.majorkernelpanic.streaming.rtp;
 
-import java.io.IOException;
-
 import android.annotation.SuppressLint;
 import android.util.Log;
+
+import java.io.IOException;
 
 /**
  * 
@@ -126,7 +126,7 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 				stats.push(duration);
 				// Computes the average duration of a NAL unit
 				delay = stats.average();
-				//Log.d(TAG,"duration: "+duration/1000000+" delay: "+delay/1000000);
+				Log.d(TAG,"duration: "+duration/1000000+" delay: "+delay/1000000 + " FPS: " + 1000/(delay/1000000));
 
 			}
 		} catch (IOException e) {

@@ -20,12 +20,6 @@
 
 package net.majorkernelpanic.streaming.hw;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.ByteBuffer;
-
-import net.majorkernelpanic.streaming.hw.CodecManager.Codec;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -38,6 +32,13 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
+
+import net.majorkernelpanic.streaming.hw.CodecManager.Codec;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.ByteBuffer;
 
 /**
  * 
@@ -802,10 +803,7 @@ public class EncoderDebugger {
 
 	}
 
-	/**
-	 * Makes sure the NAL has a header or not.
-	 * @param withPrefix If set to true, the NAL will be preceded with 0x00000001.
-	 */
+
 	private boolean hasPrefix(byte[] nal) {
 		if (nal[0] == 0 && nal[1] == 0 && nal[2] == 0 && nal[3] == 0x01)
 			return true;

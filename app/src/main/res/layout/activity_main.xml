@@ -5,7 +5,8 @@
              android:layout_height="match_parent"
              android:layout_alignParentLeft="true"
              android:layout_alignParentTop="true"
-             android:background="@android:color/black" >
+             android:background="@android:color/black"
+             android:visibility="visible"   >
 
     <net.majorkernelpanic.streaming.gl.SurfaceView
         android:id="@+id/surface"
